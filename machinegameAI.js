@@ -1,5 +1,6 @@
 var maxInt = 99999; // used when calculating minimum distances
 var maxWrenches = 5; // maximum number of wrenches a bot can hold
+var wrenchesForHold = 2; // a bot must have this number of wrenches to hold a castle
 
 var wrenches;
 var bots;
@@ -48,6 +49,24 @@ function getClosestWrench(bot, wrenches) {
     return {i: minI, dist: minDist}
 }
 
+// returns the closest bot to the castle at loc
+function getClosestBotToCastle(bots, loc) {
+    var minDist = maxInt;
+    var minI = -1;
+    
+    for (var i = 0; i < bots.length; i++) {
+        if (bots[i].wrenches >= wrenchesForHold) {
+            dist = getDistance(bots[i].x, bots[i].y, loc.x, loc.y);
+            if (dist < minDist) {
+                minDist = dist;
+                minI = i;
+            }
+        }
+    }
+    
+    return {i: minI, dist: minDist}
+}
+
 // given a bot and information for a wrench, moves the bot towards that wrench
 function moveTowardsWrench(bot, wrenchInfo) {
     if (wrenchInfo.dist == 0)
@@ -68,7 +87,17 @@ function moveRandomly(bot) {
 function play(state){
     wrenches = state.wrenches;
     bots = state.bots;
+    castles = state.castles;
     others = state.others;
+    
+    for (var i = 0; i < castles.length; i++) {
+        castleBotInfo = getClosestBotToCastle(bots, {x: castles[i].x, y: castles[i].y});
+        if (castleBotInfo.dist < maxInt && !attack(bots[castleBotInfo.i])) {
+            bots[castleBotInfo.i].moveTo(castles[i]);
+            bots.splice(castleBotInfo.i, 1);
+        }
+        else console.log("Couldn't find candidate for castle.");
+    }
     
     for (var i = 0; i < state.bots.length; i++) {
         var bot = state.bots[i];
@@ -94,3 +123,5 @@ function play(state){
         
     }
 }
+
+

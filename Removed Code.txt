@@ -1,0 +1,40 @@
+/******************** 
+    NOT USED CODE
+*********************/
+
+// given a list of bots and location, returns the closest bot the location
+// this function is currently not used
+function getClosestBot(bots, loc, isWrench) {
+    var minDist = maxInt;
+    var minI = -1;
+    if (isWrench === undefined)
+        isWrench = false;
+    
+    for (var i = 0; i < bots.length; i++) {
+        if (!isWrench || (bots[i].wrenches < maxWrenches)) {
+            dist = getDistance(bots[i].x, bots[i].y, loc.x, loc.y);
+            console.log(dist);
+            if (dist < minDist) {
+                minDist = dist;
+                minI = i;
+            }
+        }
+    }
+    
+    return {i: minI, dist: minDist}
+}
+
+// the following code was used in play for a different wrench-bot pairing method, relies on getClosestBot
+/*
+// for each wrench, send the closest bot that can take it
+for (var i = 0; i < wrenches.length; i++) {
+    closestBotInfo = getClosestBot(bots, {x: wrenches[i].x, y: wrenches[i].y}, true);
+    
+    if (closestBotInfo.dist < maxInt) {
+        console.log(closestBotInfo);
+        var bot = bots[closestBotInfo.i];
+        bot.moveTo(wrenches[i]);
+        bots.splice(closestBotInfo.i, 1);
+        wrenches.splice(i, 1);
+    }
+}*/

@@ -1,5 +1,6 @@
 var maxInt = 99999;
 var maxWrenches = 5;
+var wrenches;
 
 function getDistance(x1, y1, x2, y2) {
     return Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
@@ -8,18 +9,34 @@ function getDistance(x1, y1, x2, y2) {
 function getClosestWrench(bot, wrenches) {
     var minDist = maxInt;
     var minI = -1;
-    var distances = [];
+    //var distances = [];
     for (var i = 0; i < wrenches.length; i++) {
         dist = getDistance(bot.x, bot.y, wrenches[i].x, wrenches[i].y);
         if (dist < minDist) {
             minDist = dist;
             minI = i;
         }
-        distances.push(dist);
+        //distances.push(dist);
     }
     
-    console.log(distances);
+    //console.log(distances);
     return {i: minI, dist: minDist}
+}
+
+function moveTowardsWrench(bot, wrenchInfo) {
+    if (wrenchInfo.dist == 0)
+        bot.collect();
+    else
+        bot.moveTo(wrenches[wrenchInfo.i]);
+    wrenches.splice(wrenchInfo.i, 1);
+    return wrenches;
+}
+
+function moveRandomly(bot) {
+    toMoveX = Math.floor(Math.random() * 3 - 1) + bot.x;
+    toMoveY = Math.floor(Math.random() * 3 - 1) + bot.y;
+    bot.moveTo({x: toMoveX, y: toMoveY});
+    //console.log("Random move " + toMoveX + " " + toMoveY);
 }
 
 function play(state){
@@ -34,13 +51,11 @@ function play(state){
             var wrench = wrenches[closestWrenchInfo.i];
             
             if (closestWrenchInfo.dist != maxInt) {
-                if (closestWrenchInfo.dist == 0)
-                    bot.collect();
-                else
-                    bot.moveTo(wrench);
-                wrenches.splice(closestWrenchInfo.i, 1);
+                moveTowardsWrench(bot, closestWrenchInfo);
+                
             }
-            else console.log("No wrenches detected for bot " + i);
+            else moveRandomly(bot);
+
         }
         else { // otherwise do something else
             bot.build();
